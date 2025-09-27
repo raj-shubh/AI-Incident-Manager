@@ -80,7 +80,7 @@ class IncidentState(TypedDict):
     slack_channel: Optional[str]
     jira_ticket_url: Optional[str]
 
-# ------------ Nodes ------------
+
 def classify_node(state: IncidentState):
     state["incident_id"]=generate_incident_id()
     state["severity"]=classify_severity_llm(state["description"])
@@ -105,8 +105,8 @@ def slack_node(state: IncidentState):
         print(f"Creating Slack channel: {ch_name}")
         ch_id = create_slack_channel(ch_name)
         if ch_id:
-            state["slack_channel"] = ch_id
-            print(f"Slack channel created: {ch_id}")
+            state["slack_channel"] = ch_name
+            print(f"Slack channel created: {ch_name}")
             emails = [e.strip() for e in STAKEHOLDERS.split(",") if e.strip()] if STAKEHOLDERS else []
             if emails:
                 print(f"Inviting stakeholders: {emails}")
@@ -125,7 +125,7 @@ def jira_node(state: IncidentState) -> dict:
     try:
         summary = f"[INCIDENT] {state['incident_id']} - {state['type']} ({state['severity']})"
         description = state["description"] + "\n\nSuggested Remediation: " + state["remediation"]
-        print(f"🔄 Creating Jira ticket: {summary}")
+        print(f"Creating Jira ticket")
         
         url = create_jira_issue(summary, description, issue_type="Task")
         
@@ -148,10 +148,10 @@ workflow.add_node("jira", jira_node)
 
 workflow.add_edge(START,"classify")
 workflow.add_edge("classify","kb")
-workflow.add_edge("kb","db")     
-workflow.add_edge("db","slack")   
-workflow.add_edge("slack","jira")
-workflow.add_edge("jira",END)
+workflow.add_edge("kb","slack")     
+workflow.add_edge("slack","jira")  
+workflow.add_edge("jira","db")
+workflow.add_edge("db",END)   
 
 incident_graph=workflow.compile()
 
