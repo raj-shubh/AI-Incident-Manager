@@ -1,0 +1,26 @@
+# Web framework
+fastapi
+uvicorn
+
+# LangGraph & AI
+langgraph
+langchain-groq
+sentence-transformers
+numpy
+
+# Database
+psycopg2-binary
+pymongo
+
+# Slack
+slack-sdk
+
+# HTTP requests
+requests
+
+# Environment variables
+python-dotenv
+
+# Optional typing
+typing-extensions
+graphviz
